@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'workstation_node = factory_sim.workstation_node:main',
+            'workstation_node_client = factory_sim.workstation_node_test_client:main', 
         ],
     },
 )
