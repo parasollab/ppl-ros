@@ -44,7 +44,7 @@ class WorkstationStateNode(Node):
         self.failed_assemblies_pub                = self.create_publisher(Int32, 'failed_assemblies', 10)
         self.estimated_time_to_full_completed_pub = self.create_publisher(Float32, 'estimated_time_to_full_completed', 10)
         self.estimated_time_to_full_failed_pub    = self.create_publisher(Float32, 'estimated_time_to_full_failed', 10)
-        self.receive_parts_sub                    = self.create_subscription(Int32, 'receive_parts', self.receive_parts_callback, 1000)
+        self.receive_parts_sub                    = self.create_subscription(Int32, 'receive_parts', self.receive_parts_callback, 1)
 
     def receive_parts_callback(self, msg):
         # update parts_remaining and estimated time to empty
