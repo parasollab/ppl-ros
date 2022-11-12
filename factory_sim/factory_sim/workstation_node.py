@@ -57,16 +57,21 @@ class WorkstationStateNode(Node):
     def assembly_callback(self):
       if not self.parts_remaining == 0:
         self.parts_remaining -= 1
+        self.estimated_time_to_empty = self.time_per_assembly * self.parts_remaining
 
+      # parts_remaining msg
+      # parts_msg = Int32()
+      # parts_msg.data = self.parts_remaining
+      # self.parts_remaining_pub.publish(parts_msg)
+
+      # self.estimated_time_to_empty = (self.time_per_assembly * self.last_parts_remaining) - (self.time_per_assembly * self.parts_remaining)
+
+
+    def timer_callback(self):
       # parts_remaining msg
       parts_msg = Int32()
       parts_msg.data = self.parts_remaining
       self.parts_remaining_pub.publish(parts_msg)
-
-      self.estimated_time_to_empty = (self.time_per_assembly * self.last_parts_remaining) - (self.time_per_assembly * self.parts_remaining)
-
-
-    def timer_callback(self):
 
       # estimated_time_to_empty msg
       estimated_time_to_empty_msg = Float32()
