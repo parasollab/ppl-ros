@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'example_waypoint_follower = coordinated_commander.example_waypoint_follower:main'
         ],
     },
 )

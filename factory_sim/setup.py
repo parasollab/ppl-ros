@@ -22,6 +22,8 @@ setup(
         'console_scripts': [
             'workstation_node = factory_sim.workstation_node:main',
             'workstation_node_client = factory_sim.workstation_node_test_client:main', 
+            'agv_agent = factory_sim.agv_agent:main',
+            'dummy_allocator = factory_sim.dummy_allocator:main',
         ],
     },
 )
