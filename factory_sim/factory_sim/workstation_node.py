@@ -54,6 +54,8 @@ class WorkstationStateNode(Node):
 
         self.last_parts_remaining += msg.data
 
+        print("RECEVIED PARTS!\n\tEstimated Time to Empty:"+str(self.estimated_time_to_empty))
+
     def assembly_callback(self):
       if not self.parts_remaining == 0:
         self.parts_remaining -= 1
