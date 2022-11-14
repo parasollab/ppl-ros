@@ -31,12 +31,7 @@ class AGVAgent(Node):
                               PoseStamped,
                               self.prefix + 'task_queue',
                               self._addTaskCallback,
-                              QoSProfile(
-                                durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
-                                reliability=QoSReliabilityPolicy.RELIABLE,
-                                history=QoSHistoryPolicy.KEEP_LAST,
-                                depth=10
-                              )
+                              1
                           )
 
     #if self.namespace == '':
@@ -71,6 +66,8 @@ class AGVAgent(Node):
 
   def _addTaskCallback(self,task_pose):
     self.task_queue.append(task_pose)
+
+    print('Received Task:\n',task_pose)
 
     if self.reached_goal:
       self.executeTasks()
