@@ -31,7 +31,7 @@ class AGVAgent(Node):
                               PoseStamped,
                               self.prefix + 'task_queue',
                               self._addTaskCallback,
-                              1
+                              1000
                           )
 
     #if self.namespace == '':
@@ -99,11 +99,12 @@ class AGVAgent(Node):
 
     print('COMPLETING TASK')
 
+    topic = task.header.frame_id + '/receive_parts'
     # grap topic from task
-    task_complete_pub = self.create_publisher(Int32,task.header.frame_id,1)
+    task_complete_pub = self.create_publisher(Int32,topic,1)
 
     msg = Int32()
-    msg.data = 25
+    msg.data = 50
 
     task_complete_pub.publish(msg)
     self.get_logger().info('Publishing: "%i"' % msg.data)
