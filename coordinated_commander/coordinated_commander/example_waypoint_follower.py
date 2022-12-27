@@ -14,11 +14,12 @@
 # limitations under the License.
 
 from geometry_msgs.msg import PoseStamped
-#from coordinated_commander.robot_navigator import NamespaceNavigator, TaskResult
-from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
+from coordinated_commander.robot_navigator import NamespaceNavigator, TaskResult
+#from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 import rclpy
 from rclpy.duration import Duration
 
+import time
 """
 Basic navigation demo to go to poses.
 """
@@ -27,7 +28,7 @@ Basic navigation demo to go to poses.
 def main():
     rclpy.init()
 
-    navigator = BasicNavigator()
+    navigator = NamespaceNavigator('robot1')
 
     print('HERE!!!')
 
@@ -39,6 +40,9 @@ def main():
     initial_pose.pose.position.y = 0.5
     initial_pose.pose.orientation.z = 1.0
     initial_pose.pose.orientation.w = 0.0
+
+    print(initial_pose)
+
     navigator.setInitialPose(initial_pose)
 
     # Activate navigation, if not autostarted. This should be called after setInitialPose()
@@ -142,7 +146,7 @@ def main():
     else:
         print('Goal has an invalid return status!')
 
-    navigator.lifecycleShutdown()
+    #navigator.lifecycleShutdown()
 
     exit(0)
 

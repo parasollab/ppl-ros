@@ -45,10 +45,10 @@ class TaskResult(Enum):
 class NamespaceNavigator(Node):
 
     def __init__(self,namespace='robot'):
-        super().__init__(node_name='robot_navigator')
-        self.namespace = namespace
+        super().__init__(node_name='robot_navigator',namespace=namespace)
+        #self.namespace = namespace
         self.initial_pose = PoseStamped()
-        self.initial_pose.header.frame_id = '/map'
+        self.initial_pose.header.frame_id = 'map'
         self.goal_handle = None
         self.result_future = None
         self.feedback = None
@@ -63,30 +63,55 @@ class NamespaceNavigator(Node):
         self.initial_pose_received = False
         self.nav_through_poses_client = ActionClient(self,
                                                      NavigateThroughPoses,
-                                                     self.namespace + '/navigate_through_poses')
-        self.nav_to_pose_client = ActionClient(self, NavigateToPose, self.namespace + '/navigate_to_pose')
-        self.follow_waypoints_client = ActionClient(self, FollowWaypoints, self.namespace + '/follow_waypoints')
-        self.follow_path_client = ActionClient(self, FollowPath, self.namespace + '/follow_path')
+                                                     #self.namespace + '/navigate_through_poses')
+                                                     'navigate_through_poses')
+        self.nav_to_pose_client = ActionClient(self, NavigateToPose,
+                                               #self.namespace + '/navigate_to_pose')
+                                               'navigate_to_pose')
+        self.follow_waypoints_client = ActionClient(self, FollowWaypoints,
+                                                    #self.namespace + '/follow_waypoints')
+                                                    'follow_waypoints')
+        self.follow_path_client = ActionClient(self, FollowPath,
+                                               #self.namespace + '/follow_path')
+                                               'follow_path')
         self.compute_path_to_pose_client = ActionClient(self, ComputePathToPose,
-                                                        self.namespace + '/compute_path_to_pose')
+                                                        #self.namespace + '/compute_path_to_pose')
+                                                        'compute_path_to_pose')
         self.compute_path_through_poses_client = ActionClient(self, ComputePathThroughPoses,
-                                                              self.namespace + '/compute_path_through_poses')
-        self.spin_client = ActionClient(self, Spin, self.namespace + '/spin')
-        self.backup_client = ActionClient(self, BackUp, self.namespace + '/backup')
+                                                              #self.namespace + '/compute_path_through_poses')
+                                                              'compute_path_through_poses')
+        self.spin_client = ActionClient(self, Spin, 
+                                        #self.namespace + '/spin')
+                                        'spin')
+        self.backup_client = ActionClient(self, BackUp,
+                                          #self.namespace + '/backup')
+                                          'backup')
         self.localization_pose_sub = self.create_subscription(PoseWithCovarianceStamped,
-                                                              self.namespace + '/amcl_pose',
+                                                              #self.namespace + '/amcl_pose',
+                                                              'amcl_pose',
                                                               self._amclPoseCallback,
                                                               amcl_pose_qos)
         self.initial_pose_pub = self.create_publisher(PoseWithCovarianceStamped,
-                                                      self.namespace + '/initialpose',
+                                                      #self.namespace + '/initialpose',
+                                                      'initialpose',
                                                       10)
-        self.change_maps_srv = self.create_client(LoadMap, self.namespace + '/map_server/load_map')
+        self.change_maps_srv = self.create_client(LoadMap,
+                                                  #self.namespace + '/map_server/load_map')
+                                                  'map_server/load_map')
         self.clear_costmap_global_srv = self.create_client(
-            ClearEntireCostmap, self.namespace + '/global_costmap/clear_entirely_global_costmap')
+            ClearEntireCostmap,
+            #self.namespace + '/global_costmap/clear_entirely_global_costmap')
+            'global_costmap/clear_entirely_global_costmap')
         self.clear_costmap_local_srv = self.create_client(
-            ClearEntireCostmap, self.namespace + '/local_costmap/clear_entirely_local_costmap')
-        self.get_costmap_global_srv = self.create_client(GetCostmap, self.namespace + '/global_costmap/get_costmap')
-        self.get_costmap_local_srv = self.create_client(GetCostmap, self.namespace + '/local_costmap/get_costmap')
+            ClearEntireCostmap,
+            #self.namespace + '/local_costmap/clear_entirely_local_costmap')
+            'local_costmap/clear_entirely_local_costmap')
+        self.get_costmap_global_srv = self.create_client(GetCostmap,
+                                                         #self.namespace + '/global_costmap/get_costmap')
+                                                         'global_costmap/get_costmap')
+        self.get_costmap_local_srv = self.create_client(GetCostmap,
+                                                        #self.namespace + '/local_costmap/get_costmap')
+                                                        'local_costmap/get_costmap')
 
     def destroyNode(self):
         self.destroy_node()
@@ -284,12 +309,12 @@ class NamespaceNavigator(Node):
 
     def waitUntilNav2Active(self, navigator='', localizer=''):
         if navigator == '':
-            navigator = self.namespace + '/bt_navigator' 
+            navigator = self.get_namespace() + '/bt_navigator' 
         if localizer == '':
-            localizer = self.namespace + '/amcl'
+            localizer = self.get_namespace() + '/amcl'
         """Block until the full navigation system is up and running."""
         self._waitForNodeToActivate(localizer)
-        if localizer == self.namespace + '/amcl':
+        if localizer == self.get_namespace() + '/amcl':
             self._waitForInitialPose()
         self._waitForNodeToActivate(navigator)
         self.info('Nav2 is ready for use!')
