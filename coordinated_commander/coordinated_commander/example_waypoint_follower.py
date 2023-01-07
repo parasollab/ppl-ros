@@ -28,7 +28,7 @@ Basic navigation demo to go to poses.
 def main():
     rclpy.init()
 
-    navigator = NamespaceNavigator('robot1')
+    navigator = NamespaceNavigator('robot2')
 
     print('HERE!!!')
 
