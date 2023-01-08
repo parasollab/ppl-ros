@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'example_waypoint_follower = coordinated_commander.example_waypoint_follower:main',
-            'example_group_waypoint_follower = coordinated_commander.example_group_waypoint_follower:main'
+            'example_group_waypoint_follower = coordinated_commander.example_group_waypoint_follower:main',
+            'ppl_group_path_follower = coordinated_commander.follow_ppl_group_path:main'
         ],
     },
 )

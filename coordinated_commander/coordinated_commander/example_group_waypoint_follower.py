@@ -1,10 +1,7 @@
-
-from geometry_msgs.msg import PoseStamped
 from ppl_interfaces.msg import PPLPose, GroupPose
 from coordinated_commander.group_navigator import GroupNavigator
 #from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 import rclpy
-from rclpy.duration import Duration
 
 import time
 """
