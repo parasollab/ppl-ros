@@ -191,7 +191,7 @@ def env_to_png(directory,env_file,png_file):
       else:
         raise Exception('File type' + suffix + 'not recognized.')
 
-    plt.savefig(png_file)
+    plt.savefig(directory + '/' + png_file)
 
 def convert_to_binary(directory,png_file, binary_file):
     print(directory,png_file,binary_file)
@@ -213,7 +213,7 @@ def make_ros_map(directory,file_name):
     #
     # Read in the image
     #
-    image = cv2.imread(directory,file_name)
+    image = cv2.imread(directory + '/' + file_name)
     #
     font = cv2.FONT_HERSHEY_SIMPLEX
     #
@@ -281,7 +281,7 @@ def make_ros_map(directory,file_name):
           completeFileNameMap = os.path.join(mapLocation, mapName +".pgm")
           completeFileNameYaml = os.path.join(mapLocation, mapName +".yaml")
           yaml = open(completeFileNameYaml, "w")
-          cv2.imwrite(directory,completeFileNameMap, res );
+          cv2.imwrite(completeFileNameMap, res );
             #
             # Write some information into the file
             #
@@ -315,9 +315,9 @@ if __name__ == '__main__':
     # Parse args for names
 
     parser = argparse.ArgumentParser(description='Read in filenames')
-    parser.add_argument('--directory',help='Directory for files.')
-    parser.add_argument('--env_file',help='PPL environment file.')
-    parser.add_argument('--png_file',help='PNG filename to store intermediate representations as.')
+    parser.add_argument('-d','--directory',help='Directory for files.')
+    parser.add_argument('-e','--env_file',help='PPL environment file.')
+    parser.add_argument('-p','--png_file',help='PNG filename to store intermediate representations as.')
     args = parser.parse_args()
 
     directory = args.directory
