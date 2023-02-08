@@ -61,8 +61,9 @@ def main(args=None):
         pose = PPLPose()
         pose.x = float(data[0])
         pose.y = float(data[1])
-        pose.z = math.sin(float(data[2])*3.14/2)-0.01
-        pose.w = math.cos(float(data[2])*3.14/2)-0.01
+        pose.z = math.sin(float(data[2])*3.14/2)
+        pose.w = math.cos(float(data[2])*3.14/2)
+
 
         # Add to set of poses
         poses.append(pose)
@@ -76,7 +77,9 @@ def main(args=None):
 
     # Add to sequence of group poses
     group_poses.append(group_pose)
-      
+     
+
+  print(group_poses)
 
   # Initialize ROS2
   rclpy.init()
