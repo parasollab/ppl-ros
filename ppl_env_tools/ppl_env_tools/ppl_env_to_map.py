@@ -14,28 +14,18 @@ ix,iy = -1,-1
 x1 = [0,0,0,0]
 y1 = [0,0,0,0]
 
-def parse_2d_obj(filename,r,t,ax):
+def parse_binary_geometry(filename,r,t,ax):
 
   f = open(filename,'r')
   lines = f.readlines()
 
-  obj_sets = lines[0].split(' ')
-  num_vertices = None
-  for v in obj_sets:
-    if v == '':
-      continue
-    if num_vertices == None:
-      num_vertices = int(v)
-    else:
-      num_vertices = int(v)
-      break
-
-  # print(num_vertices)
+  obj_sets = lines[0].split()
+  num_vertices = int(obj_sets[1])
 
   vertices = []
-  edges = []
+  faces = []
 
-  for index,line in enumerate(lines[2:-1]):
+  for index,line in enumerate(lines[2:]):
     if len(line.split()) < 1:
       continue
     if len(vertices) < num_vertices:
@@ -54,24 +44,22 @@ def parse_2d_obj(filename,r,t,ax):
 
     else:
       # print('EDGE',index,line)
-      verts = [int(x) for x in line.replace('\n','').split()]
-      edges.append((verts[0],verts[1]))
-      edges.append((verts[1],verts[2]))
+      verts = [int(x) for x in line.replace('\n','').replace('-', '').split()]
+      faces.append((verts[0],verts[1],verts[2]))
 
-  for edge in edges:
-    v1 = vertices[edge[0]-1]
-    v2 = vertices[edge[1]-1]
+  for face in faces:
+    v1 = vertices[face[0]-1]
+    v2 = vertices[face[1]-1]
+    v3 = vertices[face[2]-1]
 
-
-
-    x = [v1[0],v2[0]]
-    y = [v1[1],v2[1]]
+    x = [v1[0],v2[0],v3[0],v1[0]]
+    y = [v1[1],v2[1],v3[1],v1[1]]
 
     print(x,y)
 
     ax.plot(x,y,color='black',linewidth='3')
 
-def parse_wavefront(direcotry,filename,r,t,ax,center_mesh=True):
+def parse_wavefront(directory,filename,r,t,ax,center_mesh=True):
   obj = pywavefront.Wavefront(directory + '/' + filename,collect_faces=True)
   vertices = obj.vertices
   faces = obj.mesh_list[0].faces
@@ -185,15 +173,18 @@ def env_to_png(directory,env_file,png_file):
       suffix = filename.split('.')[-1]
 
       if suffix == 'g':
-        parse_2d_obj(directory + '/' + filename,r,t,ax)
+       parse_binary_geometry(directory + '/' + filename,r,t,ax)
       elif suffix == 'obj':
         parse_wavefront(directory,filename,r,t,ax)
       else:
-        raise Exception('File type' + suffix + 'not recognized.')
+       raise Exception('File type' + suffix + 'not recognized.')
 
     plt.savefig(directory + '/' + png_file)
 
 def convert_to_binary(directory,png_file, binary_file):
+    if not '.png' in png_file:
+      png_file = png_file + ".png"
+      
     print(directory,png_file,binary_file)
     # Read the image file
     img = cv2.imread(directory + '/' + png_file)
