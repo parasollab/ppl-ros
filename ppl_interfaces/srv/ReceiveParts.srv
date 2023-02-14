@@ -1,5 +1,0 @@
-float32 time_per_assembly
-int32 num_new_parts
-string ns
-float32 completed_threshold
----
