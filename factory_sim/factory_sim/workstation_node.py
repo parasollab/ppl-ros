@@ -34,7 +34,7 @@ class WorkstationStateNode(Node):
         # number of complete parts that can be assembled. Need at least one of each type
         self.assembly_success_prob            = 95 # 95%
         self.part_grasp_success_prob          = 95 # 95%
-        self.full_assemblies_remaining             = 0
+        self.full_assemblies_remaining        = 0
         self.estimated_time_to_empty          = 0.0
         self.completed_assemblies             = 0
         self.failed_assemblies                = 0
@@ -43,8 +43,8 @@ class WorkstationStateNode(Node):
 
         # random assembly time with mean of 5s
         self.time_per_assembly                = np.random.normal(5.0, 4.9)
-        print(self.time_per_assembly)
-        self.completed_threshold              = 0.0
+        # print(self.time_per_assembly)
+        self.assembly_bin_max                 = 0.0
         
         # temporary timer to simulate workstation execution
         timer_period = 0.5
@@ -113,6 +113,12 @@ class WorkstationStateNode(Node):
 
         # compute the estimated time until empty for full assemblie
         self.estimated_time_to_empty = self.time_per_assembly * self.full_assemblies_remaining
+
+        # compute the estimated time until completed assemblies bin needs to be replaced
+        # time_per_assembly * num_parts_until_full * prob_of_success
+        self.estimated_time_to_full_completed = self.time_per_assembly * (self.assembly_bin_max - self.completed_assemblies) / self.assembly_success_prob
+
+        self.estimated_time_to_full_failed = self.time_per_assembly * (self.assembly_bin_max - self.failed_assemblies) / (1.0 - self.assembly_success_prob)
 
     def timer_callback(self):
       # parts_remaining msg for each part
