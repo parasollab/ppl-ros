@@ -7,7 +7,7 @@ from rclpy.qos import QoSDurabilityPolicy, QoSHistoryPolicy, QoSProfile, QoSReli
 from geometry_msgs.msg import PoseStamped
 
 from coordinated_commander.robot_navigator import NamespaceNavigator
-from nav2_simple_commander.robot_navigator import BasicNavigator
+#from nav2_simple_commander.robot_navigator import BasicNavigator
 
 from std_msgs.msg import String,Int32
 
@@ -35,7 +35,7 @@ class AGVAgent(Node):
                           )
 
     #if self.namespace == '':
-    self.navigator = BasicNavigator()
+    self.navigator = NamespaceNavigator(self.namespace)
     #else:
       #self.navigator = NamespaceNavigator(self.namespace)
 
