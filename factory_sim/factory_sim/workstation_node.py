@@ -6,6 +6,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import Int32, Float32
 from ppl_interfaces.msg import ReceiveParts
+# from rviz_2d_overlay_msgs.msg import OverlayText
 
 # Workstation
 #   msg/
@@ -42,7 +43,7 @@ class WorkstationStateNode(Node):
         self.estimated_time_to_full_failed    = 0.0
 
         # random assembly time with mean of 5s
-        self.time_per_assembly                = np.random.normal(5.0, 4.9)
+        self.time_per_assembly                = np.abs(np.random.normal(5.0, 2))
         # print(self.time_per_assembly)
         self.assembly_bin_max                 = 0.0
         
@@ -52,17 +53,20 @@ class WorkstationStateNode(Node):
         self.assembly_timer = self.create_timer(self.time_per_assembly, self.assembly_callback)
 
         self.estimated_time_to_empty_pub          = self.create_publisher(Float32, 'estimated_time_to_empty', 10)
-        self.completed_assemblies_pub             = self.create_publisher(Int32, 'completed_assemblies', 10)
-        self.failed_assemblies_pub                = self.create_publisher(Int32, 'failed_assemblies', 10)
+        self.completed_assemblies_pub             = self.create_publisher(Float32, 'completed_assemblies', 10)
+        # self.completed_assemblies_txt_pub         = self.create_publisher(OverlayText, 'completed_assemblies_txt', 10)
+        self.failed_assemblies_pub                = self.create_publisher(Float32, 'failed_assemblies', 10)
+        # self.failed_assemblies_txt_pub            = self.create_publisher(OverlayText, 'failed_assemblies_txt', 10)
         self.estimated_time_to_full_completed_pub = self.create_publisher(Float32, 'estimated_time_to_full_completed', 10)
         self.estimated_time_to_full_failed_pub    = self.create_publisher(Float32, 'estimated_time_to_full_failed', 10)
-        self.full_assemblies_remaining_pub        = self.create_publisher(Int32, 'full_assemblies_remaining', 10)
+        self.full_assemblies_remaining_pub        = self.create_publisher(Float32, 'full_assemblies_remaining', 10)
+
 
         self.parts_remaining_pubs                 = {}
         for part in part_names:
-          self.parts_remaining_pubs[part]         = self.create_publisher(Int32, part + '/parts_remaining', 10)
+          self.parts_remaining_pubs[part]         = self.create_publisher(Float32, part + '/parts_remaining', 10)
 
-        self.receive_parts_sub                    = self.create_subscription(ReceiveParts, 'receive_parts', self.receive_parts_callback, 1)
+        self.receive_parts_sub                    = self.create_subscription(ReceiveParts, 'receive_parts', self.receive_parts_callback, 10)
 
     def receive_parts_callback(self, msg):
 
@@ -72,7 +76,7 @@ class WorkstationStateNode(Node):
         self.parts_remaining[msg.part_type] += msg.num_parts
 
       # update the number of full parts remaining ()
-      self.full_assemblies_remaining = min(self.parts_remaining.values())
+      self.full_assemblies_remaining = int(min(self.parts_remaining.values()))
 
       self.estimated_time_to_empty = self.time_per_assembly * self.full_assemblies_remaining
 
@@ -109,7 +113,7 @@ class WorkstationStateNode(Node):
             self.parts_remaining[part_names[idx]] -= 1
 
         # compute full assemblies remaining from the individual parts remaining
-        self.full_assemblies_remaining = min(self.parts_remaining.values())
+        self.full_assemblies_remaining = int(min(self.parts_remaining.values()))
 
         # compute the estimated time until empty for full assemblie
         self.estimated_time_to_empty = self.time_per_assembly * self.full_assemblies_remaining
@@ -122,14 +126,14 @@ class WorkstationStateNode(Node):
 
     def timer_callback(self):
       # parts_remaining msg for each part
-      parts_msg = Int32()
+      parts_msg = Float32()
       for part in part_names:
-        parts_msg.data = self.parts_remaining[part]
+        parts_msg.data = float(self.parts_remaining[part])
         self.parts_remaining_pubs[part].publish(parts_msg)
       
       # full_assemblies msg for number of full assemblies remaining
-      full_assemblies_remaining_msg = Int32()
-      full_assemblies_remaining_msg.data = self.full_assemblies_remaining
+      full_assemblies_remaining_msg = Float32()
+      full_assemblies_remaining_msg.data = float(self.full_assemblies_remaining)
       self.full_assemblies_remaining_pub.publish(full_assemblies_remaining_msg)
 
 
@@ -139,14 +143,22 @@ class WorkstationStateNode(Node):
       self.estimated_time_to_empty_pub.publish(estimated_time_to_empty_msg)
 
       # completed_assemblies msg
-      completed_assemblies_msg = Int32()
-      completed_assemblies_msg.data = self.completed_assemblies
+      completed_assemblies_msg = Float32()
+      completed_assemblies_msg.data = float(self.completed_assemblies)
       self.completed_assemblies_pub.publish(completed_assemblies_msg)
 
+      # completed_assemblies_msg_txt = OverlayText()
+      # completed_assemblies_msg_txt.text = str(int(self.completed_assemblies))
+      # self.completed_assemblies_txt_pub.publish(completed_assemblies_msg_txt)
+
       # failed_assemblies msg
-      failed_assemblies_msg = Int32()
-      failed_assemblies_msg.data = self.failed_assemblies
+      failed_assemblies_msg = Float32()
+      failed_assemblies_msg.data = float(self.failed_assemblies)
       self.failed_assemblies_pub.publish(failed_assemblies_msg)
+
+      # failed_assemblies_msg_txt = OverlayText()
+      # failed_assemblies_msg_txt.text = str(int(self.failed_assemblies))
+      # self.failed_assemblies_txt_pub.publish(failed_assemblies_msg_txt)
 
       # estimated_time_to_full_completed msg
       estimated_time_to_full_completed_msg = Float32()

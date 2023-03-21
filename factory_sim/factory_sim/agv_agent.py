@@ -5,6 +5,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSDurabilityPolicy, QoSHistoryPolicy, QoSProfile, QoSReliabilityPolicy
 
 from geometry_msgs.msg import PoseStamped
+from ppl_interfaces.msg import ReceiveParts
 
 from coordinated_commander.robot_navigator import NamespaceNavigator
 #from nav2_simple_commander.robot_navigator import BasicNavigator
@@ -99,15 +100,26 @@ class AGVAgent(Node):
 
     print('COMPLETING TASK')
 
-    topic = task.header.frame_id + '/receive_parts'
+    topic = '/' + task.header.frame_id + '/receive_parts'
     # grap topic from task
-    task_complete_pub = self.create_publisher(Int32,topic,1)
+    # task_complete_pub = self.create_publisher(Int32,topic,1)
 
-    msg = Int32()
-    msg.data = 50
+    # msg = Int32()
+    # msg.data = 50
+    task_complete_pub = self.create_publisher(ReceiveParts, topic, 5)
 
+    msg = ReceiveParts()
+    msg.part_type = "top_shell"
+    msg.num_parts = 50
     task_complete_pub.publish(msg)
-    self.get_logger().info('Publishing: "%i"' % msg.data)
+
+    msg.part_type = "main_shell"
+    task_complete_pub.publish(msg)
+
+    msg.part_type = "insert_mold"
+    task_complete_pub.publish(msg)
+    
+    self.get_logger().info('Publishing: "%s", "%i" pcs' % (msg.part_type, msg.num_parts))
     return
     
 
