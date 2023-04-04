@@ -34,6 +34,12 @@ class AGVAgent(Node):
                               self._addTaskCallback,
                               1000
                           )
+    
+    self.cur_task_pub = self.create_publisher(
+                                PoseStamped,
+                                self.prefix + 'current_task',
+                                1000
+                            )
 
     #if self.namespace == '':
     self.navigator = NamespaceNavigator(self.namespace)
@@ -85,15 +91,24 @@ class AGVAgent(Node):
         msg.pose = self.task_queue[self.goal_index].pose
         self.navigator.goToPose(msg)
 
+        cur_task_msg = PoseStamped()
+        cur_task_msg.header.frame_id = self.task_queue[self.goal_index].header.frame_id
+        cur_task_msg.pose = self.task_queue[self.goal_index].pose
+
         counter = 0
         while not self.navigator.isTaskComplete():
           counter = counter + 1
+          self.cur_task_pub.publish(cur_task_msg)
           if counter % 100 == 0:
             print(self.navigator.isTaskComplete())
 
         self.complete_task(self.task_queue[self.goal_index])
         self.goal_index = self.goal_index + 1
       
+      cur_task_msg = PoseStamped()
+      cur_task_msg.header.frame_id = 'none'
+      self.cur_task_pub.publish(cur_task_msg)
+
       self.reached_goal = True
 
   def complete_task(self,task):

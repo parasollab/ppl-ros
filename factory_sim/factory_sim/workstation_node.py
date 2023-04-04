@@ -6,7 +6,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import Int32, Float32
 from ppl_interfaces.msg import ReceiveParts
-# from rviz_2d_overlay_msgs.msg import OverlayText
+from rviz_2d_overlay_msgs.msg import OverlayText
 
 # Workstation
 #   msg/
@@ -54,9 +54,9 @@ class WorkstationStateNode(Node):
 
         self.estimated_time_to_empty_pub          = self.create_publisher(Float32, 'estimated_time_to_empty', 10)
         self.completed_assemblies_pub             = self.create_publisher(Float32, 'completed_assemblies', 10)
-        # self.completed_assemblies_txt_pub         = self.create_publisher(OverlayText, 'completed_assemblies_txt', 10)
+        self.completed_assemblies_txt_pub         = self.create_publisher(OverlayText, 'completed_assemblies_txt', 10)
         self.failed_assemblies_pub                = self.create_publisher(Float32, 'failed_assemblies', 10)
-        # self.failed_assemblies_txt_pub            = self.create_publisher(OverlayText, 'failed_assemblies_txt', 10)
+        self.failed_assemblies_txt_pub            = self.create_publisher(OverlayText, 'failed_assemblies_txt', 10)
         self.estimated_time_to_full_completed_pub = self.create_publisher(Float32, 'estimated_time_to_full_completed', 10)
         self.estimated_time_to_full_failed_pub    = self.create_publisher(Float32, 'estimated_time_to_full_failed', 10)
         self.full_assemblies_remaining_pub        = self.create_publisher(Float32, 'full_assemblies_remaining', 10)
@@ -147,18 +147,18 @@ class WorkstationStateNode(Node):
       completed_assemblies_msg.data = float(self.completed_assemblies)
       self.completed_assemblies_pub.publish(completed_assemblies_msg)
 
-      # completed_assemblies_msg_txt = OverlayText()
-      # completed_assemblies_msg_txt.text = str(int(self.completed_assemblies))
-      # self.completed_assemblies_txt_pub.publish(completed_assemblies_msg_txt)
+      completed_assemblies_msg_txt = OverlayText()
+      completed_assemblies_msg_txt.text = self.get_namespace() + ' Completed Assemblies: ' + str(int(self.completed_assemblies))
+      self.completed_assemblies_txt_pub.publish(completed_assemblies_msg_txt)
 
       # failed_assemblies msg
       failed_assemblies_msg = Float32()
       failed_assemblies_msg.data = float(self.failed_assemblies)
       self.failed_assemblies_pub.publish(failed_assemblies_msg)
 
-      # failed_assemblies_msg_txt = OverlayText()
-      # failed_assemblies_msg_txt.text = str(int(self.failed_assemblies))
-      # self.failed_assemblies_txt_pub.publish(failed_assemblies_msg_txt)
+      failed_assemblies_msg_txt = OverlayText()
+      failed_assemblies_msg_txt.text = self.get_namespace() + ' Failed Assemblies: ' + str(int(self.failed_assemblies))
+      self.failed_assemblies_txt_pub.publish(failed_assemblies_msg_txt)
 
       # estimated_time_to_full_completed msg
       estimated_time_to_full_completed_msg = Float32()
