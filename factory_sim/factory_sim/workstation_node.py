@@ -60,6 +60,7 @@ class WorkstationStateNode(Node):
         self.estimated_time_to_full_completed_pub = self.create_publisher(Float32, 'estimated_time_to_full_completed', 10)
         self.estimated_time_to_full_failed_pub    = self.create_publisher(Float32, 'estimated_time_to_full_failed', 10)
         self.full_assemblies_remaining_pub        = self.create_publisher(Float32, 'full_assemblies_remaining', 10)
+        self.completed_percentage_pub             = self.create_publisher(Float32, 'completed_percentage', 10)
 
 
         self.parts_remaining_pubs                 = {}
@@ -146,6 +147,13 @@ class WorkstationStateNode(Node):
       completed_assemblies_msg = Float32()
       completed_assemblies_msg.data = float(self.completed_assemblies)
       self.completed_assemblies_pub.publish(completed_assemblies_msg)
+
+      completed_percentage_msg = Float32()
+      comp_per = 0.0
+      if self.completed_assemblies + self.failed_assemblies > 0.0:
+        comp_per = float(self.completed_assemblies / (self.completed_assemblies + self.failed_assemblies))
+      completed_percentage_msg.data = comp_per
+      self.completed_percentage_pub.publish(completed_percentage_msg)
 
       completed_assemblies_msg_txt = OverlayText()
       completed_assemblies_msg_txt.text = self.get_namespace() + ' Completed Assemblies: ' + str(int(self.completed_assemblies))

@@ -69,6 +69,10 @@ class AGVAgent(Node):
     self.navigator.setInitialPose(initial_pose)
     self.navigator.waitUntilNav2Active()
 
+    cur_task_msg = PoseStamped()
+    cur_task_msg.header.frame_id = 'none'
+    self.cur_task_pub.publish(cur_task_msg)
+
     print('Done initializing')
 
   def _addTaskCallback(self,task_pose):
