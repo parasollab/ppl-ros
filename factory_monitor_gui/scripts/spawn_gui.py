@@ -14,7 +14,6 @@ import copy
 import rospy
 import rospkg
 import rostopic
-from rospy_message_converter import message_converter
 
 # Message imports
 from std_msgs.msg import *
@@ -125,10 +124,10 @@ type_str_mappings = {
 }
 
 type_element_map = {
+  'text': overlay_text,
   'c_gauge': c_gauge_text,
   'plotter': plotter_text,
-  'l_gauge': l_gauge_text,
-  'text': overlay_text
+  'l_gauge': l_gauge_text
 }
 
 LEFT      = 50
@@ -149,7 +148,7 @@ class gui_spawner():
 
     # Read lines of template file
     data = None
-    with open('src/factory_monitor_gui/config/template.rviz', 'r') as file:
+    with open('src/ppl_ros/factory_monitor_gui/config/template.rviz', 'r') as file:
       data = file.readlines()
 
     for i in range(0, len(data)):
@@ -160,7 +159,7 @@ class gui_spawner():
         break
 
     # Write new data to rviz config
-    with open('src/factory_monitor_gui/config/config.rviz', 'w') as file:
+    with open('src/ppl_ros/factory_monitor_gui/config/config.rviz', 'w') as file:
       file.writelines(data)
       
     return
@@ -222,18 +221,6 @@ class gui_spawner():
     ws_elem_height = 0
     ws_elem_width = 0
 
-    # WS name label
-    ws_name_label = type_element_map['text']
-    element_text = ws_name_label.format(name=str(ws_name+'_name'), topic=str(''), left=str(key_left), top=str(key_top), height=str(int(HEIGHT/4)), width=str(int(WIDTH*3)), text_size=str(text_size*2))
-
-    key_top += int(HEIGHT/4 + MARGIN_SIZE/4)
-
-    # WS servicing robot
-    ws_srv_robot = type_element_map['text']
-    element_text += ws_srv_robot.format(name=str(ws_name+'_srv_robot'), topic=str(''), left=str(key_left), top=str(key_top), height=str(int(HEIGHT/4)), width=str(int(WIDTH*3)), text_size=str(text_size*2))
-
-    key_top += int(HEIGHT/4 + MARGIN_SIZE/4)
-
     for topic_type in type_element_map.keys():
       for topic in topics:
         topic_parts = str(topic[0]).split('/')
@@ -242,8 +229,15 @@ class gui_spawner():
           topic_str = str(topic[0]).strip('/gui/'+ element_type)
           elem_str = ''
 
+          # WS label + servicing robot
+          if element_type == 'text':
+            ws_name_label = type_element_map['text']
+            element_text = ws_name_label.format(name=topic_str, topic=topic[0], left=str(key_left), top=str(key_top), height=str(int(HEIGHT/4)), width=str(int(WIDTH*3)), text_size=str(text_size*2))
+
+            key_top += int(HEIGHT/4 + MARGIN_SIZE/4)
+
           # Est time to empty c_gauge
-          if element_type == 'c_gauge':
+          elif element_type == 'c_gauge':
             elem_str = type_element_map[element_type]
             element_text += elem_str.format(name=topic_str, topic=topic[0], left=str(key_left), top=str(key_top), height=str(HEIGHT), width=str(WIDTH), text_size=str(text_size))
             
