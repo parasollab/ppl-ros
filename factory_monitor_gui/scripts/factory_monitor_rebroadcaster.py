@@ -3,6 +3,7 @@
 import sys
 import os
 cwd = os.getcwd()
+import time
 
 # Python imports
 from collections import defaultdict
@@ -46,6 +47,7 @@ class Rebroadcaster():
     # {(from_type, to_type): [topic, ...], ...}
     self.rebroadcast_map = defaultdict(list)
     self.ws_service_map = defaultdict(str)
+    self.time_last_pub_map = defaultdict(float)
     with open(self.mapping_file) as file:
       msg_type = None
       for line in file:
@@ -67,6 +69,7 @@ class Rebroadcaster():
             # workspaces to track which robot is servicing it
             if str(ws_part) not in self.ws_service_map:
               self.ws_service_map[str(ws_part)] = 'none'
+              self.time_last_pub_map[str(ws_part)] = time.time()
 
 
     self.remap_subscribers = {}
@@ -87,9 +90,17 @@ class Rebroadcaster():
     for key in self.ws_service_map:
       self.remap_publishers[key] = rospy.Publisher('/gui/text/' + key + '/servicing_robot', OverlayText, queue_size=10)
 
-
   def run(self):
     while not rospy.is_shutdown():
+      new_msg = OverlayText()
+      for key in self.ws_service_map.keys():
+
+        if time.time() - self.time_last_pub_map[str(key)] > 1.0:
+          pub = self.remap_publishers[str(key)]
+          new_msg.text = """%s\n
+                        Servicing Robot: none
+                        """ % (str(key))
+          pub.publish(new_msg)
       self.rate.sleep()
   
   # currently only std_msg types are supported
@@ -101,29 +112,20 @@ class Rebroadcaster():
     if(msg_type == Float32 or msg_type == Int32):
       msg_info = msg.data
     elif(msg_type == PoseStamped):
-
       msg_info = msg.header.frame_id
     else:
       return
     
     if msg_type == PoseStamped:
       robot = str(topic).split("/")[1]
-      new_msg = str_type_mappings[type]
+      new_msg = OverlayText()
       if str(msg_info) in self.remap_publishers.keys():
         pub = self.remap_publishers[str(msg_info)]
-        # TODO: reset pub to be /ws*/servicing_robot
-        new_msg.text = """%s
+        new_msg.text = """%s\n
                         Servicing Robot: %s
                         """ % (str(msg_info), str(robot))
         pub.publish(new_msg)
-      else:
-        for key in self.ws_service_map.keys():
-          print(str(key))
-          pub = self.remap_publishers[str(key)]
-          new_msg.text = """%s
-                        Servicing Robot: none
-                        """ % (str(key))
-          pub.publish(new_msg)
+        self.time_last_pub_map[str(msg_info)] = time.time()   
     else:
       pub = self.remap_publishers[topic]
 

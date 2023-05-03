@@ -191,7 +191,7 @@ class gui_spawner():
         elem_text, new_top, new_left = self.generate_workstation_string(key, gui_topics[key], top, left, text_size)
         gui_elements += elem_text
         top = new_top
-        if elem_num % 4 == 0:
+        if elem_num % 2 == 0:
           left = new_left
           top = TOP
         elem_num += 1
@@ -232,9 +232,9 @@ class gui_spawner():
           # WS label + servicing robot
           if element_type == 'text':
             ws_name_label = type_element_map['text']
-            element_text = ws_name_label.format(name=topic_str, topic=topic[0], left=str(key_left), top=str(key_top), height=str(int(HEIGHT/4)), width=str(int(WIDTH*3)), text_size=str(text_size*2))
+            element_text = ws_name_label.format(name=topic_str, topic=topic[0], left=str(key_left+20), top=str(key_top-MARGIN_SIZE), height=str(int(HEIGHT)), width=str(int(WIDTH)), text_size=str(text_size*2))
 
-            key_top += int(HEIGHT/4 + MARGIN_SIZE/4)
+            key_top += int(HEIGHT/8 + MARGIN_SIZE/4)
 
           # Est time to empty c_gauge
           elif element_type == 'c_gauge':
