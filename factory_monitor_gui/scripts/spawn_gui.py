@@ -138,10 +138,6 @@ TEXT_SIZE = 6
 
 MARGIN_SIZE = 50
 
-# TODO: Iterate through published topics and find all with prefix '/gui'
-# TODO: Get type of pulished topic to determine appropriate gui element to display
-# TODO: For each gui element, replace the tokens in element text with proper values
-# TODO: Figure out when a new config is needed/how to scale the elements appropriately
 class gui_spawner():
   def __init__(self):
     self.rviz_components = self.generate_components_string()
@@ -182,7 +178,6 @@ class gui_spawner():
     height = HEIGHT
     width = WIDTH
     text_size = TEXT_SIZE
-    # scaling = 1.0
 
     
     elem_num = 1
@@ -263,25 +258,10 @@ class gui_spawner():
 
     # adjust top and left offsets for next workstation
     new_top = int(ws_elem_height + MARGIN_SIZE)
-    # left = int(ws_elem_width + MARGIN_SIZE)
+    
     new_left = int(ws_elem_width + MARGIN_SIZE)
     
     return gui_elements, new_top, new_left
-  
-  # def populate_component_str(self, data, topic, top, left, height, width, text_size):
-  #   element_text = type_element_map[str(topic[1])]
-  #   topic_str = str(topic[0]).strip('/gui')
-  #   if type_str_mappings[topic[1]] == OverlayText:
-  #     text_size = TEXT_SIZE * 2
-  #     width = int(WIDTH * 3)
-    
-  #   # Format ignores unneeded tokens so we can ignore
-  #   element_text = element_text.format(name=topic_str, topic=topic[0], left=str(left), top=str(top), height=str(height), width=str(width), text_size=str(text_size))
-
-  #   new_left = left + int(width + LEFT)
-  #   new_top = top + height
-
-  #   return element_text, new_top, new_left
 
   def generate_robot_string(self):
     gui_elements = ''
