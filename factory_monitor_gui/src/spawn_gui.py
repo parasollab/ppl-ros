@@ -144,7 +144,9 @@ class gui_spawner():
 
     # Read lines of template file
     data = None
-    with open('src/ppl_ros/factory_monitor_gui/config/template.rviz', 'r') as file:
+    r = rospkg.RosPack()
+    pkg_path = r.get_path('factory_monitor_gui')
+    with open(os.path.join(pkg_path, 'config/template.rviz'), 'r') as file:
       data = file.readlines()
 
     for i in range(0, len(data)):
@@ -155,7 +157,7 @@ class gui_spawner():
         break
 
     # Write new data to rviz config
-    with open('src/ppl_ros/factory_monitor_gui/config/config.rviz', 'w') as file:
+    with open(os.path.join(pkg_path, 'config/config.rviz'), 'w') as file:
       file.writelines(data)
       
     return
@@ -165,13 +167,19 @@ class gui_spawner():
   
   def generate_components_string(self):
     gui_elements = ''
+    # wait for topics to be rebroadcasted
+    # rospy.sleep(2.0)
     all_topics = rospy.get_published_topics()
 
     gui_topics = defaultdict(list)
+    # while len(gui_topics) == 0:
     for topic in all_topics:
       str_parts = str(topic[0]).split('/')[1:]
       if str_parts[0] == 'gui':
         gui_topics[str_parts[2]].append(topic)
+        # print(topic)
+    
+    # print(gui_topics)
     
     left = LEFT
     top = TOP
@@ -215,11 +223,13 @@ class gui_spawner():
 
     ws_elem_height = 0
     ws_elem_width = 0
+    element_text = ''
 
     for topic_type in type_element_map.keys():
       for topic in topics:
         topic_parts = str(topic[0]).split('/')
         element_type = topic_parts[2]
+        
         if topic_type == element_type:
           topic_str = str(topic[0]).strip('/gui/'+ element_type)
           elem_str = ''

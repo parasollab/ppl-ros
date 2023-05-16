@@ -1,0 +1,10 @@
+<launch>
+  
+  <!-- Start factory rebroadcast node -->
+  <node name="factory_monitor_rebroadcaster" pkg="factory_monitor_gui" type="factory_monitor_rebroadcaster.py" output="screen" args="mappings.txt"/>
+
+  <node name="spawn_gui" pkg="factory_monitor_gui" type="spawn_gui.py" output="screen" launch-prefix="bash -c 'sleep 2.0; $0 $@'"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find factory_monitor_gui)/config/config.rviz" launch-prefix="bash -c 'sleep 5.0; $0 $@'"/>
+
+</launch>
