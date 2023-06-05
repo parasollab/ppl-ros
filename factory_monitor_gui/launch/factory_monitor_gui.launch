@@ -7,4 +7,6 @@
 
   <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find factory_monitor_gui)/config/config.rviz" launch-prefix="bash -c 'sleep 5.0; $0 $@'"/>
 
+  <!-- <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find factory_monitor_gui)/config/config.rviz" launch-prefix="bash -c 'sleep 5.0; $0 $@'"/> -->
+
 </launch>

@@ -74,6 +74,10 @@ class Rebroadcaster():
 
     self.remap_subscribers = {}
     self.remap_publishers  = {}
+
+    self.robot_remap_subscribers = {}
+    self.robot_remap_publishers = {}
+    
     # setup rebroadcast subscribers and publishers
     for key in str_type_mappings:
       topics = self.rebroadcast_map[key]
@@ -81,10 +85,17 @@ class Rebroadcaster():
       for topic in topics:
         from_type = rostopic.get_topic_class(topic)[0]
 
-        self.remap_subscribers[topic] = rospy.Subscriber(topic, from_type, callback=self.callback, callback_args=(topic, key), queue_size=10)
-        
-        if not str(topic).startswith('/robot'):
+        if str(topic).startswith('/robot'):
+          self.robot_remap_subscribers[topic] = rospy.Subscriber(topic, from_type, callback=self.robot_callback, callback_args=(topic, key), queue_size=10)
+          self.robot_remap_publishers[topic] = rospy.Publisher('/gui/' + key + topic, str_type_mappings[key], queue_size=10)
+        elif str(topic).startswith('/ws'):
+          self.remap_subscribers[topic] = rospy.Subscriber(topic, from_type, callback=self.ws_callback, callback_args=(topic, key), queue_size=10)
           self.remap_publishers[topic]  = rospy.Publisher('/gui/'+ key + topic, str_type_mappings[key], queue_size=10)
+
+        # self.remap_subscribers[topic] = rospy.Subscriber(topic, from_type, callback=self.callback, callback_args=(topic, key), queue_size=10)
+        
+        # if not str(topic).startswith('/robot'):
+        #   self.remap_publishers[topic]  = rospy.Publisher('/gui/'+ key + topic, str_type_mappings[key], queue_size=10)
 
     # create publisher for workstation name and servicing robot
     for key in self.ws_service_map:
@@ -102,9 +113,28 @@ class Rebroadcaster():
                         """ % (str(key))
           pub.publish(new_msg)
       self.rate.sleep()
+
+  def robot_callback(self, msg, mapping_info):
+    msg_info = None
+    msg_type = type_str_mappings[msg._type]
+    topic = mapping_info[0]
+    type = mapping_info[1]
+    if(msg_type == Float32 or msg_type == Int32):
+      msg_info = msg.data
+    elif(msg_type == PoseStamped):
+      msg_info = msg.header.frame_id
+    else:
+      return
+    
+    if msg_type == PoseStamped:
+      robot = str(topic).split("/")[1]
+      new_msg = OverlayText()
+      
+    
+    return
   
   # currently only std_msg types are supported
-  def callback(self, msg, mapping_info):
+  def ws_callback(self, msg, mapping_info):
     msg_info = None
     msg_type = type_str_mappings[msg._type]
     topic = mapping_info[0]

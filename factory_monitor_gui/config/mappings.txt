@@ -23,6 +23,8 @@ l_gauge
 /ws3/insert_mold/parts_remaining
 /ws3/main_shell/parts_remaining
 /ws3/top_shell/parts_remaining
+/robot1/battery_life
+/robot2/battery_life
 
 text
 /ws0/completed_assemblies
