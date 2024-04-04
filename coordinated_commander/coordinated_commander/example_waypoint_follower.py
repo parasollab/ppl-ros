@@ -37,8 +37,8 @@ def main():
     initial_pose = PoseStamped()
     initial_pose.header.frame_id = 'map'
     initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = 0.5
-    initial_pose.pose.position.y = 1.429
+    initial_pose.pose.position.x = 0.0
+    initial_pose.pose.position.y = 00
     initial_pose.pose.orientation.z = 0.0
     initial_pose.pose.orientation.w = 1.0
 
@@ -65,15 +65,15 @@ def main():
     # local_costmap = navigator.getLocalCostmap()
 
     # set our demo's goal poses to follow
-    goal_poses = []
-    goal_pose1 = PoseStamped()
-    goal_pose1.header.frame_id = 'map'
-    goal_pose1.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = 1.5
-    initial_pose.pose.position.y = 1.429
-    goal_pose1.pose.orientation.z = 0.0
-    goal_pose1.pose.orientation.w = 1.0
-    goal_poses.append(goal_pose1)
+    # goal_poses = []
+    # goal_pose1 = PoseStamped()
+    # goal_pose1.header.frame_id = 'map'
+    # goal_pose1.header.stamp = navigator.get_clock().now().to_msg()
+    # initial_pose.pose.position.x = 1.5
+    # initial_pose.pose.position.y = 1.429
+    # goal_pose1.pose.orientation.z = 0.0
+    # goal_pose1.pose.orientation.w = 1.0
+    # goal_poses.append(goal_pose1)
 
     """
     # additional goals can be appended

@@ -10,7 +10,7 @@ from ppl_interfaces.msg import ReceiveParts
 from coordinated_commander.robot_navigator import NamespaceNavigator
 #from nav2_simple_commander.robot_navigator import BasicNavigator
 
-from std_msgs.msg import String,Int32
+from std_msgs.msg import String,Int32, Bool
 
 class AGVAgent(Node):
 
@@ -21,6 +21,7 @@ class AGVAgent(Node):
     self.task_queue = []
     self.reached_goal = True
     self.goal_index = 0
+    self.goal_counter = 0
 
     if self.namespace == '':
       self.prefix = ''
@@ -40,6 +41,18 @@ class AGVAgent(Node):
                                 self.prefix + 'current_task',
                                 1000
                             )
+    
+    self.dump_pub = self.create_publisher(
+                          String,
+                          self.prefix + 'dump',
+                          1
+                        )
+    
+    # self.task_complete_pub = self.create_publisher(
+    #                       String,
+    #                       self.prefix + 'task_complete',
+    #                       1
+    # )
 
     #if self.namespace == '':
     self.navigator = NamespaceNavigator(self.namespace)
@@ -118,27 +131,36 @@ class AGVAgent(Node):
   def complete_task(self,task):
 
     print('COMPLETING TASK')
+    self.goal_counter += 1
 
-    topic = '/' + task.header.frame_id + '/receive_parts'
-    # grap topic from task
-    # task_complete_pub = self.create_publisher(Int32,topic,1)
+    if self.goal_counter != 0 and self.goal_counter % 2 == 0:
+      msg = String()
+      msg.data = 'dump'
+      self.dump_pub.publish(msg)
 
-    # msg = Int32()
-    # msg.data = 50
-    task_complete_pub = self.create_publisher(ReceiveParts, topic, 5)
+      # self.create_rate(0.2).sleep()
 
-    msg = ReceiveParts()
-    msg.part_type = "top_shell"
-    msg.num_parts = 50
+    topic = self.prefix + 'task_complete'
+    # # grap topic from task
+    task_complete_pub = self.create_publisher(Bool,topic,1)
+
+    msg = Bool()
+    msg.data = True
     task_complete_pub.publish(msg)
+    # task_complete_pub = self.create_publisher(ReceiveParts, topic, 5)
 
-    msg.part_type = "main_shell"
-    task_complete_pub.publish(msg)
+    # msg = ReceiveParts()
+    # msg.part_type = "top_shell"
+    # msg.num_parts = 50
+    # task_complete_pub.publish(msg)
 
-    msg.part_type = "insert_mold"
-    task_complete_pub.publish(msg)
+    # msg.part_type = "main_shell"
+    # task_complete_pub.publish(msg)
+
+    # msg.part_type = "insert_mold"
+    # task_complete_pub.publish(msg)
     
-    self.get_logger().info('Publishing: "%s", "%i" pcs' % (msg.part_type, msg.num_parts))
+    # self.get_logger().info('Publishing: "%s", "%i" pcs' % (msg.part_type, msg.num_parts))
     return
     
 
