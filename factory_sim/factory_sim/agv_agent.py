@@ -12,6 +12,8 @@ from coordinated_commander.robot_navigator import NamespaceNavigator
 
 from std_msgs.msg import String,Int32, Bool
 
+import time
+
 class AGVAgent(Node):
 
   def __init__(self,namespace='',x=0,y=0):
@@ -47,6 +49,9 @@ class AGVAgent(Node):
                           self.prefix + 'dump',
                           1
                         )
+    
+    self.task_complete_pub = self.create_publisher(Bool,'/robot1/task_complete',1)
+
     
     # self.task_complete_pub = self.create_publisher(
     #                       String,
@@ -126,7 +131,21 @@ class AGVAgent(Node):
       cur_task_msg.header.frame_id = 'none'
       self.cur_task_pub.publish(cur_task_msg)
 
-      self.reached_goal = True
+      # self.reached_goal = True
+
+  def timer_callback(self):
+    print('elapsed time: ', time.time() - self.tic)
+    # topic = '/robot1/task_complete'
+
+    msg = Bool()
+    msg.data = True
+    self.task_complete_pub.publish(msg)
+    self.destroy_timer(self.timer)
+    self.timer = None
+    self.reached_goal = True
+
+    # if self.goal_index < len(self.task_queue):
+    #   self.executeTasks()
 
   def complete_task(self,task):
 
@@ -138,15 +157,20 @@ class AGVAgent(Node):
       msg.data = 'dump'
       self.dump_pub.publish(msg)
 
+      self.timer = self.create_timer(10, self.timer_callback)
+      self.tic = time.time()
+    else:
+        self.reached_goal = True
+
       # self.create_rate(0.2).sleep()
+    # print('done waiting')
+    # topic = self.prefix + 'task_complete'
+    # # # grap topic from task
+    # task_complete_pub = self.create_publisher(Bool,topic,1)
 
-    topic = self.prefix + 'task_complete'
-    # # grap topic from task
-    task_complete_pub = self.create_publisher(Bool,topic,1)
-
-    msg = Bool()
-    msg.data = True
-    task_complete_pub.publish(msg)
+    # msg = Bool()
+    # msg.data = True
+    # task_complete_pub.publish(msg)
     # task_complete_pub = self.create_publisher(ReceiveParts, topic, 5)
 
     # msg = ReceiveParts()
@@ -162,6 +186,13 @@ class AGVAgent(Node):
     
     # self.get_logger().info('Publishing: "%s", "%i" pcs' % (msg.part_type, msg.num_parts))
     return
+  
+  def run(self):
+    while(rclpy.ok()):
+      if self.reached_goal and self.goal_index < len(self.task_queue):
+        print('STARTING NEXT TASK')
+        self.executeTasks()
+      rclpy.spin_once(self)
     
 
 def main(args=None):
@@ -191,7 +222,9 @@ def main(args=None):
 
   agv_agent = AGVAgent(namespace=name,x=x,y=y)
 
-  rclpy.spin(agv_agent)
+  agv_agent.run()
+
+  # rclpy.spin(agv_agent)
 
   rclpy.shutdown()
 
